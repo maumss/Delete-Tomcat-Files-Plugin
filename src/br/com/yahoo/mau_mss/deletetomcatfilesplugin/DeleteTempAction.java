@@ -72,7 +72,7 @@ public class DeleteTempAction implements ActionListener {
     }
   }
 
-  private void mountTomcatBase() {
+  protected void mountTomcatBase() {
     StringBuilder sb = new StringBuilder();
     sb.append(SystemUtils.USER_HOME);
     sb.append(SystemUtils.FILE_SEPARATOR);
@@ -92,11 +92,14 @@ public class DeleteTempAction implements ActionListener {
     File pathFile = FileUtils.getFile(path);
     File[] folders = pathFile.listFiles((FileFilter) FileFilterUtils.directoryFileFilter());
     if (folders == null) {
-      logger.log(Level.WARNING, "Nenhum diret\u00f3rio do NetBeans encontrado em {0}", path);
+      DeleteTempAction.logger.log(Level.WARNING, "Nenhum diret\u00f3rio do NetBeans encontrado em {0}", path);
       return "";
     }
     String maiorVersao = "";
     for (File file : folders) {
+      if (!Character.isDigit(file.getName().charAt(0))) {
+        continue;
+      }
       if (file.getName().compareTo(maiorVersao) > 0) {
         maiorVersao = file.getName();
       }
@@ -108,7 +111,7 @@ public class DeleteTempAction implements ActionListener {
     File pathFile = FileUtils.getFile(path);
     File[] folders = pathFile.listFiles((FileFilter) FileFilterUtils.directoryFileFilter());
     if (folders == null) {
-      logger.log(Level.WARNING, "Nenhum diret\u00f3rio do apache encontrado em {0}", path);
+      DeleteTempAction.logger.log(Level.WARNING, "Nenhum diret\u00f3rio do apache encontrado em {0}", path);
       return "";
     }
     String pathApache = "";
@@ -125,7 +128,7 @@ public class DeleteTempAction implements ActionListener {
     for (File file : findXMLFiles(getConfDir())) {
       if (!StringUtils.startsWithIgnoreCase(file.getName(), DeleteTempAction.MANAGER_NAME)
               && !StringUtils.startsWithIgnoreCase(file.getName(), DeleteTempAction.ROOT_NAME)) {
-        logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
+        DeleteTempAction.logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
         if (!FileUtils.deleteQuietly(file)) {
           noErrorsFounde = false;
         }
@@ -155,7 +158,7 @@ public class DeleteTempAction implements ActionListener {
   private boolean apagarLogs() {
     boolean noErrorsFounde = true;
     for (File file : findLogFiles(getLogDir())) {
-      logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
+      DeleteTempAction.logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
       if (!FileUtils.deleteQuietly(file)) {
         noErrorsFounde = false;
       }
@@ -180,7 +183,7 @@ public class DeleteTempAction implements ActionListener {
   private boolean apagarTemp() {
     boolean noErrorsFounde = true;
     for (File file : findAllFiles(getTempDir())) {
-      logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
+      DeleteTempAction.logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
       if (!FileUtils.deleteQuietly(file)) {
         noErrorsFounde = false;
       }
@@ -199,7 +202,7 @@ public class DeleteTempAction implements ActionListener {
   private boolean apagarWebApps() {
     boolean noErrorsFounde = true;
     for (File file : findAllFiles(getWebAppsDir())) {
-      logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
+      DeleteTempAction.logger.log(Level.INFO, "Apagando o arquivo {0}", file.getAbsolutePath());
       if (!FileUtils.deleteQuietly(file)) {
         noErrorsFounde = false;
       }
@@ -225,13 +228,13 @@ public class DeleteTempAction implements ActionListener {
     File[] folders = pathFile.listFiles((FileFilter) FileFilterUtils.directoryFileFilter());
     boolean noErrorsFounde = true;
     if (folders == null) {
-      logger.log(Level.INFO, "Nenhum diret\u00f3rio em {0} a apagar", pathFile.getAbsolutePath());
+      DeleteTempAction.logger.log(Level.INFO, "Nenhum diret\u00f3rio em {0} a apagar", pathFile.getAbsolutePath());
       return noErrorsFounde;
     }
     for (File file : folders) {
       if (!StringUtils.startsWithIgnoreCase(file.getName(), DeleteTempAction.MANAGER_NAME)
               && !StringUtils.startsWithIgnoreCase(file.getName(), DeleteTempAction.ROOT_NAME)) {
-        logger.log(Level.INFO, "Apagando diret\u00f3rio {0}", file.getAbsolutePath());
+        DeleteTempAction.logger.log(Level.INFO, "Apagando diret\u00f3rio {0}", file.getAbsolutePath());
         if (!FileUtils.deleteQuietly(file)) {
           noErrorsFounde = false;
         }
@@ -250,6 +253,10 @@ public class DeleteTempAction implements ActionListener {
     sb.append(SystemUtils.FILE_SEPARATOR);
     sb.append("localhost");
     return sb.toString();
+  }
+
+  protected String getBaseDir() {
+    return this.baseDir;
   }
 
 }
